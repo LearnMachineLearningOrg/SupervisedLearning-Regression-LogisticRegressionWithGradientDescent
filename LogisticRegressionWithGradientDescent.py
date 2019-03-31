@@ -10,6 +10,7 @@ Created on Sat Mar 30 04:45:33 2019
 # Importing the libraries
 import os
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -105,7 +106,7 @@ x_train = sc.fit_transform(x_train)
 x_test = sc.transform(x_test)
 
 #Defining the number of iterations in our Gradient Descent
-num_iter = 500
+num_iter = 2500
 
 #Defining the learning rate
 learning_rate = 0.1
@@ -117,10 +118,22 @@ x_train = np.concatenate((intercept, x_train), axis=1)
 theta = np.zeros(x_train.shape[1])
 
 for i in range(num_iter):
+    if i >= 1:
+        previousCost = currentCost
+    
     h = sigmoid(x_train, theta)
     gradient = gradient_descent(x_train, h, y_train)
+    currentCost = cost(h, y_train)
     theta = update_weight_loss(theta, learning_rate, gradient)
-    print("Iteration: {}, Gradient: {}, Thetas: {}".format(i, gradient, theta))
+    print("Iteration: {}, Gradient: {}, Thetas: {}, PreviousCost {}, Cost {}".format(i, gradient, theta, previousCost, currentCost))
+
+    if i >= 1:
+        #Checking if the cost computed in the previous step and the 
+        #current step are close enough so that we can descide whether to 
+        #break from the iterations
+        if math.isclose(previousCost, currentCost, rel_tol=1e-09, abs_tol=0.0):
+            break;
+    
 
 #result will contain the results of classification
 result = sigmoid(x_train, theta)
